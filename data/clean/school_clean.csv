@@ -1,0 +1,124 @@
+"school_code","school_name","school_lvl","elementary","middle","high","alternative"
+1,"Home School","",0,0,0,0
+9,"Administrative","",0,0,0,0
+22,"Evening School","",0,0,0,0
+35,"Early College Academy","",0,0,0,1
+39,"Continuation School","",0,0,0,0
+44,"Interim Alternative Ed Setting","",0,0,0,0
+45,"Home or Hospital Instruction","",0,0,0,0
+47,"Private School","",0,0,0,0
+48,"Juvenile Detention Center","",0,0,0,1
+93,"Support Staff","",0,0,0,NA
+192,"Transition Services","",0,0,0,0
+203,"Ridgeview Elementary School","Elem",1,0,0,0
+204,"Sequoia Elementary School","Elem",1,0,0,0
+206,"Squaw Valley Elementary School","Elem",1,0,0,0
+207,"Pellucid Elementary School","Elem",1,0,0,0
+210,"Grimes Elementary School","Elem",1,0,0,0
+213,"Whitney Elementary School","Elem",1,0,0,0
+214,"Perlis Elementary School","Elem",1,0,0,0
+215,"Wilkes Elementary School","Elem",1,0,0,0
+216,"Hamming Elementary School","Elem",1,0,0,0
+217,"Joseph Bunker Elementary School","Elem",1,0,0,0
+219,"Minsky Elementary School","Elem",1,0,0,0
+221,"Wilkinson Elementary School","Elem",1,0,0,0
+222,"John McCarthy Elementary School","Elem",1,0,0,0
+225,"Paris Elementary School","Elem",1,0,0,0
+227,"Dijkstra Elementary School","Elem",1,0,0,0
+228,"Charles W. Bachman Elementary School","Elem",1,0,0,0
+229,"Knuth Elementary School","Elem",1,0,0,0
+230,"Newell Elementary School","Elem",1,0,0,0
+231,"Steve Jobs  Elementary School","Elem",1,0,0,0
+234,"Herbert Simon Elementary School","Elem",1,0,0,0
+236,"Grand Junction Elementary School","Elem",1,0,0,0
+237,"Rabin Elementary School","Elem",1,0,0,0
+240,"Scott Elementary School","Elem",1,0,0,0
+241,"Tumbleweed Elementary School","Elem",1,0,0,0
+243,"Chowchilla Elementary School","Elem",1,0,0,0
+244,"Backus Elementary School","Elem",1,0,0,0
+249,"Cypress Elementary School","Elem",1,0,0,0
+250,"Placid Elementary School","Elem",1,0,0,0
+252,"Bells Elementary School","Elem",1,0,0,0
+255,"Lambert Elementary School","Elem",1,0,0,0
+258,"Sherman Elementary School","Elem",1,0,0,0
+260,"Robert W. Floyd Elementary School","Elem",1,0,0,0
+261,"Iverson Elementary School","Elem",1,0,0,0
+262,"R. Hoare Elementary School","Elem",1,0,0,0
+264,"Swift Elementary School","Elem",1,0,0,0
+265,"Codd Elementary School","Elem",1,0,0,0
+267,"Cook Elementary School","Elem",1,0,0,0
+268,"Thompson Elementary School","Elem",1,0,0,0
+270,"Ritchie Elementary School","Elem",1,0,0,0
+273,"Wirth Elementary School","Elem",1,0,0,0
+275,"Karp Elementary School","Elem",1,0,0,0
+276,"Hopcroft Elementary School","Elem",1,0,0,0
+279,"Tarjan Elementary School","Elem",1,0,0,0
+280,"John Cocke Elementary School","Elem",1,0,0,0
+282,"Lush Elementary School","Elem",1,0,0,0
+285,"Spring Hill Elementary School","Elem",1,0,0,0
+288,"Fircrest Elementary School","Elem",1,0,0,0
+291,"Bloomfield Elementary School","Elem",1,0,0,0
+295,"Lawrence Elementary School","Elem",1,0,0,0
+297,"St. Helena Elementary School","Elem",1,0,0,0
+300,"Sutherland Elementary School","Elem",1,0,0,0
+303,"Kahan Elementary School","Elem",1,0,0,0
+305,"Fernando J. Corbato Elementary School","Elem",1,0,0,0
+307,"Willets Elementary School","Elem",1,0,0,0
+309,"Milner Elementary School","Elem",1,0,0,0
+310,"Lampson Elementary School","Elem",1,0,0,0
+312,"Hartmanis Stearns Elementary School","Elem",1,0,0,0
+315,"Feigenbaum Elementary School","Elem",1,0,0,0
+317,"Reddy Elementary School","Elem",1,0,0,0
+321,"Blum Elementary School","Elem",1,0,0,0
+324,"Pnueli Elementary School","Elem",1,0,0,0
+405,"Birch Middle School","Mid",0,1,0,0
+407,"Apple Middle School","Mid",0,1,0,0
+410,"Cypress Middle School","Mid",0,1,0,0
+413,"Magnolia Middle School","Mid",0,1,0,0
+415,"Chestnut Middle School","Mid",0,1,0,0
+416,"Elm Middle School","Mid",0,1,0,0
+418,"Maple Middle School","Mid",0,1,0,0
+420,"Buckeye Middle School","Mid",0,1,0,0
+425,"Fir Middle School","Mid",0,1,0,0
+427,"Cottonwood Middle School","Mid",0,1,0,0
+430,"Forest Middle School","Mid",0,1,0,0
+435,"Redwood Middle School","Mid",0,1,0,0
+440,"Witchhazel Middle School","Mid",0,1,0,0
+445,"Pine Middle School","Mid",0,1,0,0
+448,"Elderberry Middle School","Mid",0,1,0,0
+450,"Palm Middle School","Mid",0,1,0,0
+452,"Orange Middle School","Mid",0,1,0,0
+455,"Willow Middle School","Mid",0,1,0,0
+457,"Oak Middle School","Mid",0,1,0,0
+460,"Spruce Middle School","Mid",0,1,0,0
+465,"Holly Middle School","Mid",0,1,0,0
+470,"Cedar Middle School","Mid",0,1,0,0
+475,"Poplar Middle School","Mid",0,1,0,0
+480,"Cherry Middle School","Mid",0,1,0,0
+485,"Dogwood Middle School","Mid",0,1,0,0
+490,"Hickory Middle School","Mid",0,1,0,0
+492,"Anchor Middle School","Mid",0,1,0,0
+511,"Night School","",0,0,0,1
+513,"Summer School","",0,0,0,0
+514,"North High School","High",0,0,1,0
+515,"Camino High School","High",0,0,1,0
+516,"Generations Academy","High",0,0,1,0
+520,"Upland High School","High",0,0,1,0
+525,"Orchard High School","High",0,0,1,0
+530,"South High School","High",0,0,1,0
+540,"River High School","High",0,0,1,0
+549,"Brighter Tomorrow High School","High",0,0,1,1
+550,"White Sands High School","High",0,0,1,0
+560,"Peak High School","High",0,0,1,0
+570,"West Spring Hill High School","High",0,0,1,0
+575,"Grand View High School","High",0,0,1,0
+576,"Heritage High School","High",0,0,1,0
+580,"Central High School","High",0,0,1,0
+590,"City High School","High",0,0,1,0
+592,"Career Enrichment Center","",0,0,0,1
+594,"Great Plains Alternative High School","High",0,0,1,1
+596,"Liberty High School","High",0,0,1,1
+597,"Travelling High School","High",0,0,1,1
+800,"District Headquarters","",0,0,0,0
+840,"New Visions Alternative Middle School","Mid",0,1,0,1
+900,"Family Elementary School","Elem",1,0,0,1

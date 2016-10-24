@@ -9,7 +9,7 @@
 ##      2. Indicates school level                                       ##
 ##                                                                      ##
 ##  Inputs:  data/raw/School_Raw.dta                                    ##
-##  Outputs: data/clean/School_Clean.csv                                ##
+##  Outputs: data/clean/school_clean.csv                                ##
 ##########################################################################
 
 
@@ -49,7 +49,7 @@
   
 # Read in clean SDP file to check results. --------------------------------
 
-  sdp_school_clean  <- read.dta13('data/clean/School_Clean.dta')
+  sdp_school_clean  <- read.dta13('data/sdp_clean/School_Clean.dta')
   # Looks like there is an error in the SDP file for the middle school column.  The rest matches.
   compare(school_clean, sdp_school_clean)
   compare(school_clean, sdp_school_clean, allowAll = TRUE)
