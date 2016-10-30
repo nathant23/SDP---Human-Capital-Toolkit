@@ -19,11 +19,10 @@
 
   setwd("C:/Users/Nathan/Desktop/SDP - Human Capital Toolkit")
 
-  library(foreign)
-  library(plyr)
-  library(dplyr)
   library(compare)
   library(haven)
+  library(tidyverse)
+  
 
 # Mode Function -----------------------------------------------------------
 
@@ -50,14 +49,14 @@
   count(staff_raw, certification_pathway)
   staff_raw$certification_pathway <- toupper(staff_raw$certification_pathway)
   ## Convert certifications to numbers and then set to factors with labels.
-  staff_raw$certification_pathway <- revalue(staff_raw$certification_pathway,
-                                             c('STD CERT' 		             = 1,
-                                               'STANDARD CERTIFICATION' 	 = 1,
-                                               'ALTERNATIVE CERTIFICATION' = 2,
-                                               'ALTCERT' 			             = 2,
-                                               'ALT'			= 2,
-                                               'TAF'			= 3,
-                                               'TFA'			= 3))
+  staff_raw$certification_pathway <- recode(staff_raw$certification_pathway,
+                                            'STD CERT'                  = 1,
+                                            'STANDARD CERTIFICATION'    = 1,
+                                            'ALTERNATIVE CERTIFICATION' = 2,
+                                            'ALTCERT'                   = 2,
+                                            'ALT'  = 2,
+                                            'TAF'  = 3,
+                                            'TFA'  = 3)
   
   staff_raw$certification_pathway <- factor(staff_raw$certification_pathway,
                                             levels = c(1,2,3),
@@ -82,34 +81,33 @@
     group_by(tid) %>%
     arrange(desc(school_year)) %>%
     mutate(male 	= Mode(male),
-           certification_pathway 	= Mode(certification_pathway) 
-    ) %>%
+           certification_pathway 	= Mode(certification_pathway)) %>%
     ungroup() 
 
 
 # Standardize Ethnicity Values --------------------------------------------
 
   ## Convert Ethnicities to numeric values to change to factors later:
-  #	1 = 'Black'	
-  #	2 = 'Asian'	
-  #	3 = 'Latino'
-  #	4 = 'Native American'
+  # 1 = 'Black'	
+  # 2 = 'Asian'	
+  # 3 = 'Latino'
+  # 4 = 'Native American'
   # 5 = 'White'
-  #	6 = 'Multiple/Other'
+  # 6 = 'Multiple/Other'
 
   count(staff_raw, race_ethnicity)
   staff_raw$race_ethnicity[staff_raw$race_ethnicity == ''] <- NA
   staff_raw$race_ethnicity <- toupper(staff_raw$race_ethnicity)
-  staff_raw$race_ethnicity <- revalue(staff_raw$race_ethnicity, 
-                                      c('WHITE' 		= 5,
-                                        'HISPANIC'	= 3,
-                                        'HISP' 		  = 3,
-                                        'ASIAN'		  = 2,
-                                        'NATIVE AMERICAN'  = 4,
-                                        'MULTIPLE / OTHER' = 6,
-                                        'AFRICAN AMERICAN' = 1,
-                                        'AFAM' 		  = 1,
-                                        'BLACK' 		= 1))
+  staff_raw$race_ethnicity <- recode(staff_raw$race_ethnicity,
+                                     'WHITE'            = 5,
+                                     'HISPANIC'         = 3,
+                                     'HISP'             = 3,
+                                     'ASIAN'            = 2,
+                                     'NATIVE AMERICAN'  = 4,
+                                     'MULTIPLE / OTHER' = 6,
+                                     'AFRICAN AMERICAN' = 1,
+                                     'AFAM'             = 1,
+                                     'BLACK'            = 1)
   
 
 # Prioritize Latino and Multiracial within years. -------------------------
@@ -120,9 +118,9 @@
   # Prioritize Latino then multi-racial within years for teachers.
   staff_raw <- staff_raw %>%
     group_by(tid, school_year) %>%
-    mutate(t_count 		     = n(),
-           isLatino		     = max(temp_islatino, na.rm = TRUE),
-           race_ethnicity	 = ifelse(!is.na(isLatino) && isLatino == 1, 3, race_ethnicity), # 3 is the numeric value representing Latino
+    mutate(t_count         = n(),
+           isLatino        = max(temp_islatino, na.rm = TRUE),
+           race_ethnicity  = ifelse(!is.na(isLatino) && isLatino == 1, 3, race_ethnicity), # 3 is the numeric value representing Latino
            nvals_race_year = n_distinct(race_ethnicity),
            race_ethnicity  = ifelse(nvals_race_year > 1, 6, race_ethnicity)) %>% # 6 is the numeric value representing Multiple/Other
     ungroup()
@@ -149,16 +147,14 @@
     ungroup()
 
   
-  
-  
 # Check/resolve duplicate or missing dates of birth. ----------------------------
 
   # Below returned no multiple birthdates for individual teachers.
-  View(staff_raw %>%
+  staff_raw %>%
          group_by(tid) %>%
          mutate(nvals_dob = n_distinct(birth_date)) %>%
          filter(nvals_dob > 1)
-  )
+  
   # Below returned no missing values for birth dates.
   sum(is.na(staff_raw$birth_date))
   
