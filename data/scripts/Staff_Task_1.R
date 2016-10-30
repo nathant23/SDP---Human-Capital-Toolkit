@@ -23,7 +23,7 @@
   library(plyr)
   library(dplyr)
   library(compare)
-  library(readstata13)
+  library(haven)
 
 # Mode Function -----------------------------------------------------------
 
@@ -40,14 +40,14 @@
 
 # Read raw data file  & keep only needed fields ---------------------------
 
-  staff_raw <- read.dta('data/raw/Staff_School_Year_Raw.dta')
+  staff_raw <- read_dta('data/raw/Staff_School_Year_Raw.dta')
   staff_raw <- unique(staff_raw[,c('tid', 'school_year', 'male', 'race_ethnicity', 'certification_pathway', 'birth_date')])
   
 
   
 # Standardize Certification Values ----------------------------------------
 
-  table(staff_raw$certification_pathway)
+  count(staff_raw, certification_pathway)
   staff_raw$certification_pathway <- toupper(staff_raw$certification_pathway)
   ## Convert certifications to numbers and then set to factors with labels.
   staff_raw$certification_pathway <- revalue(staff_raw$certification_pathway,
@@ -63,8 +63,8 @@
                                             levels = c(1,2,3),
                                             labels = c("Standard Certification", "Alternative Certification", "TFA"))
   
-  table(staff_raw$certification_pathway)
-
+  count(staff_raw, certification_pathway)
+  
 
 
 # Resolve duplicated 'male' and 'certification_pathway' by teacher --------
@@ -97,7 +97,7 @@
   # 5 = 'White'
   #	6 = 'Multiple/Other'
 
-  table(staff_raw$race_ethnicity)
+  count(staff_raw, race_ethnicity)
   staff_raw$race_ethnicity[staff_raw$race_ethnicity == ''] <- NA
   staff_raw$race_ethnicity <- toupper(staff_raw$race_ethnicity)
   staff_raw$race_ethnicity <- revalue(staff_raw$race_ethnicity, 
@@ -174,7 +174,7 @@
 
 # Read in and compare to SDP clean file. ----------------------------------
 
-  sdp_staff_clean  <- read.dta13('data/sdp_clean/Staff_Attributes_Clean.dta')
+  sdp_staff_clean  <- read_dta('data/sdp_clean/Staff_Attributes_Clean.dta')
   
   compare(staff_clean, sdp_staff_clean)
   compare(staff_clean, sdp_staff_clean, allowAll = TRUE)
