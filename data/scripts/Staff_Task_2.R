@@ -5,10 +5,10 @@
 ##  Updates:                                                               ##
 ##                                                                         ##
 ##  Description: Generates the staff_certifications_clean file which has:  ##
-##		1. Identify teachers with special certifications                     ##
-##		2. Determine year teachers became certified and                      ##
-##			the year certifications expired                                    ##
-##		2. One record per teacher per year                                   ##
+##    1. Identify teachers with special certifications                     ##
+##    2. Determine year teachers became certified and                      ##
+##       the year certifications expired                                    ##
+##    2. One record per teacher per year                                   ##
 ##                                                                         ##
 ##  Inputs:  data/raw/staff_certifications.dta                             ##
 ##  Outputs: data/clean/staff_certifications_clean.csv                     ##
