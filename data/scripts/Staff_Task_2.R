@@ -105,9 +105,9 @@
   cert_all_years <- unique(cert_all_years)
   
   # Reshape from long to wide format so each teacher has one row per year
-  cert_all_years 		<- spread(cert_all_years, 
-                              key = cert_code, # Column whose values will become column headings
-                              value = certified) # Column whose alues will populate the cells
+  cert_all_years <- spread(cert_all_years,
+                           key = cert_code, # Column whose values will become column headings
+                           value = certified) # Column whose alues will populate the cells
   # Rename and order needed columns
   cert_all_years %<>% select(tid,
                              school_year,
