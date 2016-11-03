@@ -7,7 +7,7 @@
 ##  Description: Generates the staff_certifications_clean file which has:  ##
 ##    1. Identify teachers with special certifications                     ##
 ##    2. Determine year teachers became certified and                      ##
-##       the year certifications expired                                    ##
+##       the year certifications expired                                   ##
 ##    2. One record per teacher per year                                   ##
 ##                                                                         ##
 ##  Inputs:  data/raw/staff_certifications.dta                             ##
@@ -81,39 +81,31 @@
 
   
 # Determine and create valid school years for each teacher certificaion --------------
-
-  # Create empty vectors to hold data while looping through the records.
-  tid         <- vector('numeric')
-  cert_code   <- vector('character')
-  school_year <- vector('numeric')
-  certified   <- vector('numeric')
   
-  # Function to apply to each row of the cert_raw data frame in order to create every valid year per certification.
-  certYear <- function(x) {
-    # x[[5]]:x[[6]] is the range of years from effective_date_year to expiration_date_year.
-    for (year in x['effective_date_year']:x['expiration_date_year']) {
-      tid         <<- c(tid, as.numeric(x['tid']))
-      cert_code   <<- c(cert_code, x['certification_code'])
-      school_year <<- c(school_year, year)
-      certified   <<- c(certified, 1)
-    }		
-  }
+  # Create a column with the number of years the certification is valid.
+  cert_raw$years <- cert_raw$expiration_date_year - cert_raw$effective_date_year + 1
   
-  # Loop through each record then combine created vectors into new data.frame and remove duplicates.
-  output         <- apply(cert_raw, 1, certYear)
-  cert_all_years <- tibble(tid, school_year, cert_code, certified)
-  cert_all_years <- unique(cert_all_years)
+  # Use rep() to repeate each row for the number of years the certification was valid and then
+  #  use mutate to explicitly fill in the sequence of valid school years for each teacher, certificaiton combo.
+  cert_all_years <- cert_raw[rep(1:nrow(cert_raw), cert_raw$years),] %>%
+    group_by(tid, certification_code) %>%
+    mutate(school_year = effective_date_year + row_number() - 1,
+           certified = 1) %>%
+    select(tid, school_year, certification_code, certified)
   
-  # Reshape from long to wide format so each teacher has one row per year
+  # Reshape from long to wide format so each teacher has one row per year.
   cert_all_years <- spread(cert_all_years,
-                           key = cert_code, # Column whose values will become column headings
+                           key = certification_code, # Column whose values will become column headings
                            value = certified) # Column whose alues will populate the cells
-  # Rename and order needed columns
+  
+  # Rename and order needed columns.
   cert_all_years %<>% select(tid,
                              school_year,
                              certification_esl = `ENGLISH AS A SECOND LANGUAGE CERTIFICATION`,
                              certification_nbct = `NATIONAL BOARD CERTIFICATION`,
                              certificaiton_sped = `SPECIAL EDUCATION CERTIFICATION`)
+  
+
   
   
   
