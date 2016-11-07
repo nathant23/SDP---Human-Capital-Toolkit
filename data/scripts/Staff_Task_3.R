@@ -56,24 +56,67 @@
                                                    `MASTERS DEGREE` = 2L,
                                                    `DOCTORATE DEGREE` = 3L, .default = NA_integer_)
   
+ 
+# Clean degree values (missing or inconsistent across years). ---------------------------------
+  # Loop through each degree type starting at Doctorate down to Bachelors (3:1)
+  #  This will be used to: 
+  #   - Identify the span of years the degree covers.
+  #   - Explicitly write in hte degree type within the span of years.
+  #   - Write in the degree type to any missing values in proceeding years.
   
+  for (clean_degree in 3:1) {
+    
+    staff_raw_columns <- colnames(staff_raw)
+    
+    # Find the min and max years for each degree type.
+    degree_years <- select(staff_raw, tid, school_year, deg_num = degree_num) %>% # Renamed degree_num to be different from original data.
+                      filter(deg_num == clean_degree) %>%
+                      group_by(tid, deg_num) %>%
+                      summarize(min_deg_year = min(school_year),
+                                max_deg_year = max(school_year)) %>%
+                      ungroup()
+    
+    # Merge degree_years back with the raw data.
+    staff_raw %<>% left_join(degree_years, by = c('tid' = 'tid'))
+    
+    # Write over the degree_num if it is within the span of degree years.
+    staff_raw$degree_num[!is.na(staff_raw$min_deg_year) &
+                           staff_raw$school_year >= staff_raw$min_deg_year &
+                           staff_raw$school_year <= staff_raw$max_deg_year] <- clean_degree
+    
+    ##  Write in the degree type to any missing values that are after the span of years.
+    staff_raw$degree_num[!is.na(staff_raw$min_deg_year) & 
+                           is.na(staff_raw$degree_num)  & 
+                           staff_raw$max_deg_year <= staff_raw$school_year] <- clean_degree
+    
+    ## Reduce the raw data back down to the original columns.
+    staff_raw <- staff_raw[staff_raw_columns]
+    rm(degree_years, clean_degree, staff_raw_columns)
+  }
   
+ 
+# Standardize the job_code & job_code_desc ----------------------------------------------------
+
+  View(freq_table('staff_raw', 'job_code_desc'))
   
+  staff_raw$job_code_desc <- toupper(staff_raw$job_code_desc)
+  staff_raw$job_code_desc <- ifelse(staff_raw$job_code_desc == 'AP', 'PRINCIPAL / ASSISTANT PRINCIPAL', staff_raw$job_code_desc)
+  staff_raw$job_code_desc <- ifelse(str_detect(staff_raw$job_code_desc, 'COACH'), 'COACH'             , staff_raw$job_code_desc)
+  staff_raw$job_code_desc <- ifelse(str_detect(staff_raw$job_code_desc, 'TEACH|TAECH|TCHR'), 'TEACHER', staff_raw$job_code_desc)
   
+  # Check that each job_code_desc corresponds to only one job_code and vice versa
+  freq_table2('staff_raw', 'job_code', 'job_code_desc') # Job code '3' represents 'CLASSROOM ASSISTANT' & 'SUBSTITUTE'
   
+  # Assign a new job code to classroom assistants
+  staff_raw$job_code <- ifelse(staff_raw$job_code_desc == 'CLASSROOM ASSISTANT', 9, staff_raw$job_code)
+  staff_raw$job_code <- as.numeric(staff_raw$job_code)
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+  # Check range of job codes per person within school years.
+  staff_raw %>% group_by(tid, school_year) %>%
+                  mutate(nvals_job = n_distinct(job_code)) %>%
+                  ungroup() %>%
+                  select(nvals_job) %>% 
+                  table()
   
   
   
