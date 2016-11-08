@@ -171,7 +171,7 @@
                              labels = c("Bachelor's Degree", "Master's Degree", "Doctorate Degree"))
   
   ## Order the data and take only unique rows.
-  my_clean_degree_job <- staff_raw %>%
+  staff_degrees_job_codes_clean <- staff_raw %>%
                            select(tid, school_year, school_code, job_code, degree, 
                                   t_is_teacher, experience, hire_date, termination_date) %>%
                            arrange(tid, school_year) %>%
@@ -182,7 +182,7 @@
   
   sdp_clean_degree_job <- read_dta('data/sdp_clean/Staff_Degrees_Job_Codes_Clean.dta')
   
-  my_file <- my_clean_degree_job
+  my_file <- staff_degrees_job_codes_clean
   my_file$degree <- as.numeric(my_file$degree)
   
   compare(my_file, sdp_clean_degree_job, allowAll = TRUE)
@@ -190,6 +190,6 @@
  
 
 # Write to file. ------------------------------------------------------------------------------
-  save(my_clean_degree_job, file = 'data/clean/staff_degrees_job_codes_clean.rda')
-  write.csv(my_clean_degree_job, 'data/clean/staff_degrees_job_codes_clean.csv')
+  save(staff_degrees_job_codes_clean, file = 'data/clean/staff_degrees_job_codes_clean.rda')
+  write.csv(staff_degrees_job_codes_clean, 'data/clean/staff_degrees_job_codes_clean.csv')
  
