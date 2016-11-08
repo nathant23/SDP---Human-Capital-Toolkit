@@ -47,7 +47,7 @@
   staff_raw$degree <- toupper(staff_raw$degree)
   
   staff_raw$degree <- ifelse(str_detect(staff_raw$degree, 'BA|A.B'), 'BACHELORS DEGREE', staff_raw$degree)
-  staff_raw$degree <- ifelse(str_detect(staff_raw$degree, 'MA'),      'MASTERS DEGREE'  , staff_raw$degree)
+  staff_raw$degree <- ifelse(str_detect(staff_raw$degree, 'MA'),     'MASTERS DEGREE'  , staff_raw$degree)
   staff_raw$degree <- ifelse(str_detect(staff_raw$degree, 'PH'),     'DOCTORATE DEGREE', staff_raw$degree)
   freq_table('staff_raw', 'degree', sort_by_count = TRUE)
   
@@ -112,21 +112,84 @@
   staff_raw$job_code <- as.numeric(staff_raw$job_code)
   
   # Check range of job codes per person within school years.
-  staff_raw %>% group_by(tid, school_year) %>%
-                  mutate(nvals_job = n_distinct(job_code)) %>%
-                  ungroup() %>%
-                  select(nvals_job) %>% 
-                  table()
+  staff_raw <- staff_raw %>%
+                 group_by(tid, school_year) %>%
+                 mutate(nvals_job = n_distinct(job_code)) %>%
+                 ungroup()
+  
+  freq_table('staff_raw', 'nvals_job')
+  
+
+# Clean job codes. ----------------------------------------------------------------------------
+  
+  # Remove duplicate job codes within school years by job priority:
+  #  1. TEACHER (1)
+  #  2. PRINCIPAL / ASSISTANT PRINCIPAL (2)
+  #  3. COUNSELOR (5)
+  #  4. SPECIAL EDUCAITON ASSISTANT (6)
+  #  5. CLASSROOM ASSISTANT (9)
+  #  6. SCHOOL STAFF (8)
+  #  7. COACH (4)
+  #  8. SUBSTITUTE (3)
+  #  9. TEMP (7)
+  
+  ##  Create a column to designate if an employee was identified at all as a teacher during the year.
+  ##  Create a column to designate if an employee was identified at all as a principal during the year and not a teacher.
+  staff_raw %<>% group_by(tid, school_year) %>%
+                   mutate(t_is_teacher = ifelse(1 %in% job_code, 1, 0),
+                          principal    = ifelse(2 %in% job_code & t_is_teacher != 1, 1, 0)) %>%
+                   ungroup()
+  
+  ## Write over all job codes to teacher or principal if they were identified as either during the year.
+  staff_raw$job_code <- ifelse(staff_raw$t_is_teacher == 1, 1, staff_raw$job_code)
+  staff_raw$job_code <- ifelse(staff_raw$principal == 1,    2, staff_raw$job_code)
   
   
+  ## To match SDP output, this for loop goes through each job code in reverse order of priority
+  ##      and if an employee has muliple job codes within the year it drops that job code.  
+  ##      Then it recalculates the number of job codes within the year (nvals_job) and moves to the next job code.
+  for (code in c(7,3,4,8,9,6)) {
+    staff_raw <- staff_raw %>%
+      group_by(tid, school_year) %>%
+      filter(!(nvals_job > 1 & job_code == code)) %>%
+      mutate(nvals_job = n_distinct(job_code)) %>%
+      ungroup()
+  }
   
+
+# Format data and create final data frame. ----------------------------------------------------
+
+  ## Convert the job codes to factors.
+  staff_raw$job_code <- factor(staff_raw$job_code,
+                               levels = c(1,2,3,4,5,6,7,8,9),
+                               labels = c('Teacher', 'Principal / Assistant Principal', 'Substitute', 'Coach', 'Counselor', 
+                                          'Special Education Assistant', 'Temp', 'School Staff', 'Classroom Assistant'))
   
+  ## Convert the degrees to factors.
+  staff_raw$degree <- factor(staff_raw$degree_num,
+                             levels = c(1,2,3),
+                             labels = c("Bachelor's Degree", "Master's Degree", "Doctorate Degree"))
   
+  ## Order the data and take only unique rows.
+  my_clean_degree_job <- staff_raw %>%
+                           select(tid, school_year, school_code, job_code, degree, 
+                                  t_is_teacher, experience, hire_date, termination_date) %>%
+                           arrange(tid, school_year) %>%
+                           unique(.)
+    
+ 
+# Compare with clean SDP file. ----------------------------------------------------------------
   
+  sdp_clean_degree_job <- read_dta('data/sdp_clean/Staff_Degrees_Job_Codes_Clean.dta')
   
+  my_file <- my_clean_degree_job
+  my_file$degree <- as.numeric(my_file$degree)
   
-  
-  
-  
-  
-  
+  compare(my_file, sdp_clean_degree_job, allowAll = TRUE)
+
+ 
+
+# Write to file. ------------------------------------------------------------------------------
+  save(my_clean_degree_job, file = 'data/clean/staff_degrees_job_codes_clean.rda')
+  write.csv(my_clean_degree_job, 'data/clean/staff_degrees_job_codes_clean.csv')
+ 
