@@ -85,11 +85,19 @@
   
 # Clean up job codes and school assigments: Across yearsr. -------------------------------------
 
+<<<<<<< HEAD
   # Create a function that for teachers with more than one school code per year, use the school code from the 
   # following (n+1) year  or prior (n-1) year if one of the school codes matches that school code. 
   school_assign_adjacent <- function(data_frame, prior_or_following){
     
     arrangement <- ifelse(prior_or_following == 'prior',
+=======
+  # For teachers with more than one school code per year, use the school code from the 
+  # following (n+1) year if one of the school codes matches that school code. 
+  school_assign_adjacent <- function(data_frame, prior_or_next){
+    
+    arrangement <- ifelse(prior_or_next == 'prior',
+>>>>>>> f82ac00a8a1d56a055032b5964a1903a98f12b9d
                           'desc(school_year)',
                           'school_year')
     data_frame %>%
@@ -117,7 +125,11 @@
   }
     
     
+<<<<<<< HEAD
   staff_school_year <- school_assign_adjacent(staff_school_year, 'following')
+=======
+  staff_school_year <- school_assign_adjacent(staff_school_year, 'next')
+>>>>>>> f82ac00a8a1d56a055032b5964a1903a98f12b9d
   freq_table('staff_school_year', 'nvals_school2')
   
   staff_school_year <- school_assign_adjacent(staff_school_year, 'prior')
