@@ -62,7 +62,7 @@
     group_by(tid, school_year) %>%
     mutate(ms_es = max(temp_ms_es)) %>%
     ungroup() %>%
-    filter(!(high == 1 & ms_es == 1))
+    filter(!(high == 1 & ms_es == 1 & nvals_school > 1))
     
   # If an individual has more than one school code within the same year and one of them is a nontraditional school
   #   and the other is a traditional school, keep the traditional school observation.
@@ -71,7 +71,7 @@
     group_by(tid, school_year) %>%
     mutate(non_alternative = min(alternative)) %>%
     ungroup() %>%
-    filter(!(alternative == 1 & non_alternative == 1))
+    filter(!(alternative == 1 & non_alternative == 0 & nvals_school > 1))
   
   staff_school_year %<>%
     group_by(tid, school_year) %>%
@@ -81,9 +81,10 @@
   freq_table('staff_school_year', 'nvals_school2')
   
   # Remove unnecessary columns
-  staff_school_year %<>% select(-nvals_school, -temp_ms_es, -ms_es, -non_alternative)
+  staff_school_year %<>% select(tid, school_year, school_code, job_code, degree, t_is_teacher,
+                                experience, hire_date, termination_date, nvals_school2)
   
-# Clean up job codes and school assigments: Across yearsr. -------------------------------------
+# Clean up job codes and school assigments: Across years. -------------------------------------
 
 
   # Create a function that for teachers with more than one school code per year, use the school code from the 
@@ -125,6 +126,76 @@
   staff_school_year <- school_assign_adjacent(staff_school_year, 'prior')
   freq_table('staff_school_year', 'nvals_school2')
 
+  staff_school_year %<>% unique(.)
+
+# Clean up job codes and school assignments: Random. ------------------------------------------
+  
+  # Now the only teachers assigned to more than one school are assigned to two schools that 
+  #   do not repeat in the years following or preceding the year in which the teacher has 
+  #   two schools. For these remaining cases, keep an observation at random.
+  staff_school_year %<>% 
+    group_by(tid, school_year) %>%
+    mutate(keep = row_number()) %>% 
+    filter(keep == 1) %>%
+    select(-nvals_school2, -keep) %>%
+    ungroup()
+  
+  # Check that the data file is unique by teacher and school year.
+  nrow(staff_school_year) == nrow(unique(staff_school_year[,c("tid", "school_year")]))
+
+    
+# P. 54 - Drop variables that still need to be cleaned and save as a temp file ---------------
+  
+  clean_school <- select(staff_school_year, 
+                         -experience, -hire_date, -termination_date)
+  
+  
+# Resolve inconsistencies in years of teacher experience across years. ------------------------
+  
+  # Keep only observations where the individual is a teacher.
+  staff_school_year %<>% filter(t_is_teacher == 1)
+  
+  # It is vital to have only one occurance of the first year of experience teachering.
+  #  Force experience = 2 for all but the earliest instance of 1 for a given teacher.
+  staff_school_year %<>% 
+    group_by(tid) %>%
+    mutate(min_novice_year = min(school_year),
+           experience = ifelse(experience == 1 & school_year != min_novice_year, 2, experience)) %>%
+    ungroup()
+  
+  # Write a function to flag every instance when a value of experience is less than the prior value 
+  #   for a given teacher. Write over the flagged experience with the prior year's experience.
+  drops <- function(data_frame){
+    
+    data_frame %<>%
+      group_by(tid) %>%
+      arrange(tid, school_year) %>%
+      mutate(neg = ifelse(tid == lag(tid) & experience < lag(experience), 1, 0),
+             neg = ifelse(is.na(neg), 0, neg),
+             experience = ifelse(neg == 1, lag(experience), experience)) %>%
+      ungroup() 
+    
+  }
+  
+  # Run the function until there are no flags left.
+  staff_school_year <- drops(staff_school_year)
+  while (sum(staff_school_year$neg, na.rm = TRUE) > 0) { 
+    staff_school_year <- drops(staff_school_year) 
+    }
+  
+  # Write a function to fix jumps in experience that are too large given the number of years that 
+  #   have elapsed (for example, a teacher’s experience increases by two in one year), 
+  #   and count all such instances in the whole data.
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
   
   
