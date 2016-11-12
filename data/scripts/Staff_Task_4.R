@@ -6,7 +6,7 @@
 ##  Description: Create a file that contains one observation for each school year                ##
 ##               a teacher is in the data.  This will:                                           ##
 ##                                                                                               ##
-##               1. Identify one unique school code per teacher within each school year.         ##
+##               1. Identify one distinct school code per teacher within each school year.       ##
 ##               2. Resolve inconsistencies in years of teacher experience across school years.  ##
 ##               3. Assign one hire and terminiation date to each employment period.             ##
 ##                                                                                               ##
@@ -42,7 +42,7 @@
   
 # Clean up job codes and school assignments: Alternative and high schools. --------------------------------------------------
 
-  # Create variable that shows how many unique values school_code assumes for each individual and school year.
+  # Create variable that shows how many distinct values school_code assumes for each individual and school year.
   staff_school_year %<>% 
     group_by(tid, school_year) %>%
     mutate(nvals_school = n_distinct(school_code)) %>%
@@ -80,7 +80,7 @@
   
   freq_table('staff_school_year', 'nvals_school2')
   
-  # Remove unnecessary columns
+  # Keep necessary columns
   staff_school_year %<>% select(tid, school_year, school_code, job_code, degree, t_is_teacher,
                                 experience, hire_date, termination_date, nvals_school2)
   
@@ -126,7 +126,7 @@
   staff_school_year <- school_assign_adjacent(staff_school_year, 'prior')
   freq_table('staff_school_year', 'nvals_school2')
 
-  staff_school_year %<>% unique(.)
+  staff_school_year %<>% distinct()
 
 # Clean up job codes and school assignments: Random. ------------------------------------------
   
@@ -140,8 +140,8 @@
     select(-nvals_school2, -keep) %>%
     ungroup()
   
-  # Check that the data file is unique by teacher and school year.
-  nrow(staff_school_year) == nrow(unique(staff_school_year[,c("tid", "school_year")]))
+  # Check that the data file is distinct by teacher and school year.
+  nrow(staff_school_year) == nrow(distinct(staff_school_year[,c("tid", "school_year")]))
 
     
 # P. 54 - Drop variables that still need to be cleaned and save as a temp file ---------------
@@ -221,7 +221,8 @@
     ungroup() 
   
   # Keep only the variables needed.
-  staff_school_year %<>% select(tid, school_year, school_code, job_code, experience, t_is_teacher, hire_date, termination_date)
+  staff_school_year %<>% select(tid, school_year, school_code, job_code, experience,
+                                t_is_teacher, hire_date, termination_date)
   
   
 # Identify employment periods -----------------------------------------------------------------
@@ -238,26 +239,21 @@
    
 # Merge the temporary file with cleaned school codes to current file. -------------------------
   
+  staff_school_year_clean <- full_join(clean_school, staff_school_year,
+                                       by = c('tid' = 'tid', 'school_year' = 'school_year',
+                                              'school_code' = 'school_code', 'job_code' = 'job_code',
+                                              't_is_teacher' = 't_is_teacher')) %>%
+                             select(tid, school_year, school_code, job_code,degree,
+                                    t_is_teacher, experience, hire_date, termination_date) %>%
+                             arrange(tid, school_year)
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+  # Check that data is distinct by tid and school year.
+  nrow(staff_school_year_clean) == nrow(distinct(filter(staff_school_year_clean, tid, school_year)))
+    
+
+# Write to file. ------------------------------------------------------------------------------
+
+  save(staff_school_year_clean, file = 'data/clean/staff_school_year_clean.rda')
+  write.csv(staff_school_year_clean, 'data/clean/staff_school_year_clean.csv')
   
   
