@@ -186,11 +186,57 @@
   # Write a function to fix jumps in experience that are too large given the number of years that 
   #   have elapsed (for example, a teacher’s experience increases by two in one year), 
   #   and count all such instances in the whole data.
+  jumps <- function(data_frame){
+    
+    data_frame %>%
+      group_by(tid) %>%
+      arrange(tid, school_year) %>%
+      mutate(jump = ifelse(!is.na(experience) & !is.na(lag(experience)) &
+                             school_year - lag(school_year) < experience - lag(experience),1,0),
+             jump = ifelse(is.na(jump), 0, jump),
+             experience = ifelse(jump == 1 & experience == lead(experience),experience - 1, experience),
+             jump2 = lead(jump, default = 0),
+             experience = ifelse(jump2 == 1, lead(experience) - 1, experience),
+             jump = ifelse(!is.na(experience) & !is.na(lag(experience)) &
+                             school_year - lag(school_year) < experience - lag(experience),1,0),
+             jump = ifelse(is.na(jump), 0, jump)) %>%
+      ungroup() %>% 
+      select(-jump2)
+  
+  }
+  
+  # Run the function until there are no jump flags left.  
+  staff_school_year %<>% jumps()
+  while (sum(staff_school_year$jump) > 0) {
+    staff_school_year %<>% jumps()
+  } 
+  
+  # Replace years of experience in 2012 for missing observations, assuming that the teacher 
+  #   gains one year of experience from the prior year.
+  staff_school_year %<>%
+    group_by(tid) %>%
+    arrange(tid, school_year) %>%
+    mutate(experience = ifelse(tid == lag(tid) & t_is_teacher == 1 & school_year == 2012 & is.na(experience),
+                               lag(experience) + 1, experience)) %>%
+    ungroup() 
+  
+  # Keep only the variables needed.
+  staff_school_year %<>% select(tid, school_year, school_code, job_code, experience, t_is_teacher, hire_date, termination_date)
+  
+  
+# Identify employment periods -----------------------------------------------------------------
 
+  # This is from page 57 of 'SDP_Data_Building_Tasks_HC_12_18_2013.pdf'.
+  #   I did not understand the purpose of this code, which made it difficult for me to think about
+  #   how to replicate it in R.  When comparing dates for the hire and terminiation fields
+  #   in my file at this point to the SDP clean file there were no differences where data existed.
+  #   The differences were in null terminiation dates being populated in the SDP file, yet there 
+  #   were still tens of thousands of null dates. Also where terminiation dates were populated,
+  #   they were filled in with dates prior to the hire date.  
+  #   Perhaps I'll revisit once I see how these files will be used later in the analysis.
   
-  
-  
-  
+   
+# Merge the temporary file with cleaned school codes to current file. -------------------------
   
   
   
